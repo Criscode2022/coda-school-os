@@ -1,0 +1,13 @@
+node_modules
+dist
+.angular
+.DS_Store
+*.log
+.env
+.env.local
+coverage
+.vercel
+tmp
+screenshots
+artifacts
+.grok

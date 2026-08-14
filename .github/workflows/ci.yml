@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: |
+          npm install --prefix apps/api --no-fund --no-audit
+          npm install --prefix apps/web --no-fund --no-audit
+      - name: Build
+        run: npm run build
+      - name: API smoke
+        run: |
+          PORT=3001 HOST=127.0.0.1 node apps/api/dist/main.js &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:3001/api/health && break
+            sleep 1
+          done
+          API_URL=http://127.0.0.1:3001/api node scripts/api-smoke.mjs
